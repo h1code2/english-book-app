@@ -12,6 +12,11 @@
         android:icon="@drawable/ic_school"
         app:showAsAction="always" />
     <item
+        android:id="@+id/action_backup"
+        android:title="@string/action_backup"
+        android:icon="@drawable/ic_backup"
+        app:showAsAction="always" />
+    <item
         android:id="@+id/action_review"
         android:title="@string/menu_review"
         android:icon="@drawable/ic_review_alt"

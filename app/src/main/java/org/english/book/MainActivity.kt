@@ -1,20 +1,32 @@
 package org.english.book
 
+import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
 import android.view.Menu
 import android.view.MenuItem
+import android.widget.Toast
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.core.view.isVisible
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import org.english.book.data.BackupManager
 import org.english.book.data.EntryType
 import org.english.book.data.ListFilter
 import org.english.book.data.SortMode
 import org.english.book.databinding.ActivityMainBinding
 import org.english.book.tts.TtsHelper
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
 
 class MainActivity : AppCompatActivity() {
 
@@ -131,6 +143,10 @@ class MainActivity : AppCompatActivity() {
                 applyFilter()
                 true
             }
+            R.id.action_backup -> {
+                showBackupDialog()
+                true
+            }
             else -> super.onOptionsItemSelected(item)
         }
     }
@@ -169,6 +185,114 @@ class MainActivity : AppCompatActivity() {
             .setNegativeButton(R.string.action_cancel, null)
             .show()
     }
+
+    //region 备份 / 还原
+
+    private fun maybeRequestPersistable(uri: Uri) {
+        try {
+            contentResolver.takePersistableUriPermission(
+                uri,
+                Intent.FLAG_GRANT_READ_URI_PERMISSION or Intent.FLAG_GRANT_WRITE_URI_PERMISSION
+            )
+        } catch (_: SecurityException) {
+            // 非持久化授权（例如某些提供方），导出导入一次性进行，不影响功能
+        }
+    }
+
+    private fun showBackupDialog() {
+        val items = arrayOf(
+            getString(R.string.backup_export),
+            getString(R.string.backup_import)
+        )
+        MaterialAlertDialogBuilder(this)
+            .setTitle(R.string.action_backup)
+            .setItems(items) { _, which ->
+                if (which == 0) launchExport() else launchImport()
+            }
+            .setNegativeButton(R.string.action_cancel, null)
+            .show()
+    }
+
+    private val exportLauncher =
+        registerForActivityResult(ActivityResultContracts.CreateDocument("application/octet-stream")) { uri ->
+            if (uri == null) return@registerForActivityResult
+            maybeRequestPersistable(uri)
+            lifecycleScope.launch {
+                val result = withContext(Dispatchers.IO) {
+                    BackupManager.export(applicationContext, uri)
+                }
+                if (result.ok) {
+                    Toast.makeText(
+                        this@MainActivity,
+                        getString(R.string.backup_export_ok, result.count),
+                        Toast.LENGTH_LONG
+                    ).show()
+                } else {
+                    Toast.makeText(this@MainActivity, result.message, Toast.LENGTH_LONG).show()
+                }
+            }
+        }
+
+    private val importLauncher =
+        registerForActivityResult(ActivityResultContracts.OpenDocument()) { uri ->
+            if (uri == null) return@registerForActivityResult
+            maybeRequestPersistable(uri)
+            // 先在主线程做一次轻量确认文案所需的信息在 IO 校验后给出
+            lifecycleScope.launch {
+                val check = withContext(Dispatchers.IO) {
+                    BackupManager.inspect(applicationContext, uri)
+                }
+                if (!check.ok) {
+                    Toast.makeText(this@MainActivity, check.message, Toast.LENGTH_LONG).show()
+                    return@launch
+                }
+                MaterialAlertDialogBuilder(this@MainActivity)
+                    .setTitle(R.string.backup_confirm_title)
+                    .setMessage(getString(R.string.backup_confirm_msg, check.count))
+                    .setPositiveButton(R.string.action_ok) { _, _ ->
+                        lifecycleScope.launch {
+                            val result = withContext(Dispatchers.IO) {
+                                BackupManager.restore(applicationContext, uri)
+                            }
+                            if (result.ok) {
+                                Toast.makeText(
+                                    this@MainActivity,
+                                    getString(R.string.backup_restore_ok, result.count),
+                                    Toast.LENGTH_LONG
+                                ).show()
+                                // 数据库文件已整体替换，重启进程以重建连接
+                                restartApp()
+                            } else {
+                                Toast.makeText(
+                                    this@MainActivity, result.message, Toast.LENGTH_LONG
+                                ).show()
+                            }
+                        }
+                    }
+                    .setNegativeButton(R.string.action_cancel, null)
+                    .show()
+            }
+        }
+
+    private fun launchExport() {
+        val name = "english_notebook_" +
+            SimpleDateFormat("yyyyMMdd_HHmm", Locale.getDefault()).format(Date()) + ".db"
+        exportLauncher.launch(name)
+    }
+
+    private fun launchImport() {
+        importLauncher.launch(arrayOf("application/octet-stream", "*/*"))
+    }
+
+    private fun restartApp() {
+        val intent = packageManager.getLaunchIntentForPackage(packageName)
+        intent?.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK)
+        finish()
+        startActivity(intent)
+        Runtime.getRuntime().exit(0)
+    }
+
+    //endregion
 
     override fun onDestroy() {
         tts.shutdown()

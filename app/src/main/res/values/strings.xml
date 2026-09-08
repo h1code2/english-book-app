@@ -45,4 +45,11 @@
     <string name="clear_search">清除</string>
     <string name="empty_no_result_title">没有匹配的记录</string>
     <string name="empty_no_result_subtitle">换个关键词试试，或清除筛选条件</string>
+    <string name="action_backup">备份 / 还原</string>
+    <string name="backup_export">导出备份（SQLite 数据库文件）</string>
+    <string name="backup_import">从备份还原</string>
+    <string name="backup_export_ok">已导出 %1$d 条记录</string>
+    <string name="backup_restore_ok">还原成功，共 %1$d 条记录，即将重启应用</string>
+    <string name="backup_confirm_title">用备份还原？</string>
+    <string name="backup_confirm_msg">备份文件中有 %1$d 条记录。\n\n还原后，当前应用里的所有记录会被备份文件中的内容替换。</string>
 </resources>

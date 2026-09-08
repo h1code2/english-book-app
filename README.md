@@ -8,6 +8,7 @@
 - **浏览**：卡片列表（字母头像 + 时间徽标）+ 类型筛选 + **实时搜索**（输入即过滤，匹配标题和正文）+ 排序（最近修改 / 最新添加 / 标题 A→Z / Z→A）+「只看未掌握」+ 条数统计
 - **发音**：点击喇叭或「发音」按钮用系统 TTS 朗读，可在美音 / 英音间切换
 - **复习**：闪卡模式（可复习全部或只复习未掌握）——正面只显示单词或句子，翻面看完整内容，「已掌握 / 再看看」记录掌握状态并持久化
+- **备份 / 还原**：数据保存在 SQLite 数据库文件（`english_notebook.db`）；可一键导出为 `.db` 文件（任意设备/工具可读），也可从备份文件还原（还原前校验文件合法性并二次确认，完成后自动重启应用）
 - **首次启动**自动预置 4 条示例（wallet、summer、两个例句）
 - 包名：`org.english.book`
 
@@ -61,6 +62,14 @@ app/src/main/java/org/english/book/
 - `debug.keystore`：项目内 debug 签名（构建沙箱不允许写 `~/.android`）
 - `.gradle-home/`：预填的 Gradle 发行版与依赖缓存（`GRADLE_USER_HOME` 指向它）
 - `.android-home/`：AVD 的工作区克隆（模拟器验证用，约 8.8 GB，不需要可整目录删除）
+
+## 数据与备份
+
+数据保存在应用的 SQLite 数据库文件中：`/data/data/org.english.book/databases/english_notebook.db`（通过 Room 访问）。
+
+- **导出**：工具栏云朵图标 → 「导出备份」，生成形如 `english_notebook_20260908_1430.db` 的文件到所选位置（导出前自动做 WAL checkpoint 合并日志，文件即完整数据库）
+- **还原**：工具栏云朵图标 → 「从备份还原」，选择 `.db` 文件；应用会先校验文件（必须是包含 entries 表的合法 SQLite 库）并显示记录条数，确认后替换数据库并自动重启
+- 备份文件就是标准 SQLite 数据库，可用电脑上的 DB Browser for SQLite、sqlite3 等工具直接打开查看
 
 ## 后续可扩展
 
