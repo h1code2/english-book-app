@@ -1,4 +1,4 @@
-package org.english.book
+package org.h1code2.english.notebook
 
 import android.os.Bundle
 import android.view.View
@@ -7,11 +7,11 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
 import androidx.lifecycle.ViewModelProvider
-import org.english.book.data.EntryEntity
-import org.english.book.data.EntryType
-import org.english.book.databinding.ActivityReviewBinding
-import org.english.book.tts.TtsHelper
-import org.english.book.ui.SimpleMarkdownRenderer
+import org.h1code2.english.notebook.data.EntryEntity
+import org.h1code2.english.notebook.data.EntryType
+import org.h1code2.english.notebook.databinding.ActivityReviewBinding
+import org.h1code2.english.notebook.tts.TtsHelper
+import org.h1code2.english.notebook.ui.SimpleMarkdownRenderer
 
 class ReviewActivity : AppCompatActivity() {
 
@@ -59,7 +59,7 @@ class ReviewActivity : AppCompatActivity() {
             current()?.let { tts.speak(SpeakText.forEntry(it)) }
         }
         // 点按闪卡背面中的英文单词即朗读
-        org.english.book.ui.WordTapSpeaker.attach(binding.textBackContent) { word ->
+        org.h1code2.english.notebook.ui.WordTapSpeaker.attach(binding.textBackContent) { word ->
             tts.speak(word)
         }
 

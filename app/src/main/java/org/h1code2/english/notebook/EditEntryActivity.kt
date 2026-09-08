@@ -1,4 +1,4 @@
-package org.english.book
+package org.h1code2.english.notebook
 
 import android.content.Intent
 import android.os.Bundle
@@ -8,10 +8,10 @@ import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.isVisible
 import androidx.lifecycle.ViewModelProvider
-import org.english.book.data.EntryEntity
-import org.english.book.data.EntryType
-import org.english.book.databinding.ActivityEditEntryBinding
-import org.english.book.ui.SimpleMarkdownRenderer
+import org.h1code2.english.notebook.data.EntryEntity
+import org.h1code2.english.notebook.data.EntryType
+import org.h1code2.english.notebook.databinding.ActivityEditEntryBinding
+import org.h1code2.english.notebook.ui.SimpleMarkdownRenderer
 
 class EditEntryActivity : AppCompatActivity() {
 

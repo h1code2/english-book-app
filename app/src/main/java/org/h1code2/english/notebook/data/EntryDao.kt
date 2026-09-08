@@ -1,4 +1,4 @@
-package org.english.book.data
+package org.h1code2.english.notebook.data
 
 import androidx.lifecycle.LiveData
 import androidx.room.Dao

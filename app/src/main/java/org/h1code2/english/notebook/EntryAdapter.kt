@@ -1,4 +1,4 @@
-package org.english.book
+package org.h1code2.english.notebook
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
@@ -7,10 +7,10 @@ import androidx.core.view.isVisible
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
-import org.english.book.data.EntryEntity
-import org.english.book.data.EntryType
-import org.english.book.databinding.ItemEntryBinding
-import org.english.book.ui.SimpleMarkdownRenderer
+import org.h1code2.english.notebook.data.EntryEntity
+import org.h1code2.english.notebook.data.EntryType
+import org.h1code2.english.notebook.databinding.ItemEntryBinding
+import org.h1code2.english.notebook.ui.SimpleMarkdownRenderer
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale

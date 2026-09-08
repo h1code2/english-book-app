@@ -13,15 +13,15 @@ val keystoreProps = Properties().apply {
 }
 
 android {
-    namespace = "org.english.book"
+    namespace = "org.h1code2.english.notebook"
     compileSdk = 34
 
     defaultConfig {
-        applicationId = "org.english.book"
+        applicationId = "org.h1code2.english.notebook"
         minSdk = 26
         targetSdk = 34
-        versionCode = 4
-        versionName = "1.3.0"
+        versionCode = 5
+        versionName = "1.4.0"
     }
 
     signingConfigs {

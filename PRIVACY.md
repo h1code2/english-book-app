@@ -1,6 +1,6 @@
 # 隐私说明（PRIVACY）
 
-**英语笔记本**（org.english.book）是一款纯本地应用。我们高度重视你的隐私：
+**英语笔记本**（org.h1code2.english.notebook）是一款纯本地应用。我们高度重视你的隐私：
 
 ## 数据存储
 

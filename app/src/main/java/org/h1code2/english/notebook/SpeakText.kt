@@ -1,7 +1,7 @@
-package org.english.book
+package org.h1code2.english.notebook
 
-import org.english.book.data.EntryEntity
-import org.english.book.ui.SimpleMarkdownRenderer
+import org.h1code2.english.notebook.data.EntryEntity
+import org.h1code2.english.notebook.ui.SimpleMarkdownRenderer
 
 /**
  * 生成 TTS 朗读文本：单词直接读标题；句子读标题；

@@ -1,7 +1,7 @@
-package org.english.book
+package org.h1code2.english.notebook
 
-import org.english.book.data.EntryType
-import org.english.book.ui.SimpleMarkdownRenderer
+import org.h1code2.english.notebook.data.EntryType
+import org.h1code2.english.notebook.ui.SimpleMarkdownRenderer
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Test

@@ -1,4 +1,4 @@
-package org.english.book
+package org.h1code2.english.notebook
 
 import android.app.Application
 import android.os.Handler
@@ -8,10 +8,10 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.switchMap
 import androidx.lifecycle.viewModelScope
-import org.english.book.data.AppDatabase
-import org.english.book.data.EntryDao
-import org.english.book.data.EntryEntity
-import org.english.book.data.ListFilter
+import org.h1code2.english.notebook.data.AppDatabase
+import org.h1code2.english.notebook.data.EntryDao
+import org.h1code2.english.notebook.data.EntryEntity
+import org.h1code2.english.notebook.data.ListFilter
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import kotlinx.coroutines.Dispatchers
@@ -49,7 +49,7 @@ class EntryViewModel(app: Application) : AndroidViewModel(app) {
             else entry.copy(updatedAt = now)
             withContext(Dispatchers.IO) {
                 if (isNew) dao.insert(toSave) else dao.update(toSave)
-                org.english.book.data.BackupManager.autoBackup(getApplication())
+                org.h1code2.english.notebook.data.BackupManager.autoBackup(getApplication())
             }
             refreshStats()
             mainHandler.post { onDone() }
@@ -60,7 +60,7 @@ class EntryViewModel(app: Application) : AndroidViewModel(app) {
         viewModelScope.launch {
             withContext(Dispatchers.IO) {
                 dao.delete(entry)
-                org.english.book.data.BackupManager.autoBackup(getApplication())
+                org.h1code2.english.notebook.data.BackupManager.autoBackup(getApplication())
             }
             refreshStats()
             mainHandler.post { onDone() }
@@ -71,7 +71,7 @@ class EntryViewModel(app: Application) : AndroidViewModel(app) {
         viewModelScope.launch {
             withContext(Dispatchers.IO) {
                 dao.update(entry.copy(mastered = mastered, updatedAt = System.currentTimeMillis()))
-                org.english.book.data.BackupManager.autoBackup(getApplication())
+                org.h1code2.english.notebook.data.BackupManager.autoBackup(getApplication())
             }
             refreshStats()
         }

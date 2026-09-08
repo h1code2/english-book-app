@@ -1,4 +1,4 @@
-package org.english.book.data
+package org.h1code2.english.notebook.data
 
 import androidx.room.RoomDatabase
 import androidx.sqlite.db.SupportSQLiteDatabase

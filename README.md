@@ -20,7 +20,7 @@
 - **自动备份**：每次修改数据后自动在应用私有目录留一份备份（保留最近 7 份），可在备份对话框中一键从自动备份恢复
 - **深色模式**：跟随系统深色 / 浅色模式
 - **首次启动**自动预置 4 条示例（wallet、summer、两个例句）
-- 包名：`org.english.book`，隐私说明见 [PRIVACY.md](PRIVACY.md)
+- 包名：`org.h1code2.english.notebook`，隐私说明见 [PRIVACY.md](PRIVACY.md)
 
 ## 技术栈
 
@@ -75,7 +75,7 @@ app/src/main/java/org/english/book/
 
 ## 数据与备份
 
-数据保存在应用的 SQLite 数据库文件中：`/data/data/org.english.book/databases/english_notebook.db`（通过 Room 访问）。
+数据保存在应用的 SQLite 数据库文件中：`/data/data/org.h1code2.english.notebook/databases/english_notebook.db`（通过 Room 访问）。
 
 - **导出**：工具栏云朵图标 → 「导出备份」，生成形如 `english_notebook_20260908_1430.db` 的文件到所选位置（导出前自动做 WAL checkpoint 合并日志，文件即完整数据库）
 - **还原**：工具栏云朵图标 → 「从备份还原」，选择 `.db` 文件；应用会先校验文件（必须是包含 entries 表的合法 SQLite 库）并显示记录条数，确认后替换数据库并自动重启

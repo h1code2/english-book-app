@@ -1,4 +1,4 @@
-package org.english.book
+package org.h1code2.english.notebook
 
 import android.content.Intent
 import android.net.Uri
@@ -17,12 +17,12 @@ import androidx.core.view.isVisible
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import org.english.book.data.BackupManager
-import org.english.book.data.EntryType
-import org.english.book.data.ListFilter
-import org.english.book.data.SortMode
-import org.english.book.databinding.ActivityMainBinding
-import org.english.book.tts.TtsHelper
+import org.h1code2.english.notebook.data.BackupManager
+import org.h1code2.english.notebook.data.EntryType
+import org.h1code2.english.notebook.data.ListFilter
+import org.h1code2.english.notebook.data.SortMode
+import org.h1code2.english.notebook.databinding.ActivityMainBinding
+import org.h1code2.english.notebook.tts.TtsHelper
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import java.text.SimpleDateFormat
 import java.util.Date
