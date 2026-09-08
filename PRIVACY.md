@@ -25,6 +25,6 @@
 
 ## 联系方式
 
-如对本隐私说明有疑问，请在 GitHub 仓库提交 Issue：https://github.com/h1code2/english-book-app
+如对本隐私说明有疑问，请在 GitHub 仓库提交 Issue：https://github.com/h1code2/english-notebook-app
 
 （最近更新：2026-09-08）

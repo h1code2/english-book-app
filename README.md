@@ -4,7 +4,7 @@
 
 ## 下载安装
 
-前往 [GitHub Releases](https://github.com/h1code2/english-book-app/releases) 下载最新的 `EnglishNotebook-v*.apk`，传到手机直接安装（需允许安装未知来源应用）。
+前往 [GitHub Releases](https://github.com/h1code2/english-notebook-app/releases) 下载最新的 `EnglishNotebook-v*.apk`，传到手机直接安装（需允许安装未知来源应用）。
 
 > 从 v1.2 或更早的 debug 签名版本升级：签名不同无法覆盖安装。请先在旧版里**导出备份**，安装新版后再**从备份还原**。
 
