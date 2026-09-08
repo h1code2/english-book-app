@@ -140,6 +140,15 @@ class MainActivity : AppCompatActivity() {
                 item.setIcon(
                     if (filter.onlyLearning) R.drawable.ic_school_checked else R.drawable.ic_school
                 )
+                // 选中态用金色：menu XML 的 iconTint(白) 会覆盖新 icon 自带颜色，这里同步纠正
+                item.setIconTintList(
+                    android.content.res.ColorStateList.valueOf(
+                        androidx.core.content.ContextCompat.getColor(
+                            this,
+                            if (filter.onlyLearning) R.color.again_orange else android.R.color.white
+                        )
+                    )
+                )
                 applyFilter()
                 true
             }
