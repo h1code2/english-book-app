@@ -20,6 +20,13 @@ object BackupManager {
 
     data class Result(val ok: Boolean, val count: Int = 0, val message: String? = null)
 
+    private const val AUTO_DIR = "backups"
+    private const val AUTO_PREFIX = "english_notebook_auto_"
+    private const val AUTO_KEEP = 7
+    private const val AUTO_MIN_INTERVAL_MS = 5 * 60 * 1000L
+    private const val PREFS = "backup_prefs"
+    private const val PREF_LAST_AUTO = "last_auto_at"
+
     /** 校验 uri 指向的文件是包含 entries 表的合法 SQLite 库，返回条目数 */
     fun inspect(context: Context, uri: Uri): Result {
         return try {
@@ -100,4 +107,85 @@ object BackupManager {
             Result(false, message = "还原失败：${e.message}")
         }
     }
+
+    //region 自动本地备份（应用私有目录，保留最近 7 份）
+
+    /** 数据变更后调用；内部做 5 分钟节流。返回是否真的执行了备份 */
+    fun autoBackup(context: Context): Boolean {
+        val prefs = context.getSharedPreferences(PREFS, Context.MODE_PRIVATE)
+        val now = System.currentTimeMillis()
+        if (now - prefs.getLong(PREF_LAST_AUTO, 0L) < AUTO_MIN_INTERVAL_MS) return false
+
+        val dir = File(context.filesDir, AUTO_DIR).apply { mkdirs() }
+        val stamp = java.text.SimpleDateFormat("yyyyMMdd_HHmmss", java.util.Locale.US).format(now)
+        val target = File(dir, "$AUTO_PREFIX$stamp.db")
+        if (!copyDbTo(context, target.outputStream())) return false
+
+        prefs.edit().putLong(PREF_LAST_AUTO, now).apply()
+
+        // 只保留最近 AUTO_KEEP 份
+        dir.listFiles { f -> f.name.startsWith(AUTO_PREFIX) }
+            ?.sortedByDescending { it.name }
+            ?.drop(AUTO_KEEP)
+            ?.forEach { it.delete() }
+        return true
+    }
+
+    /** 列出自动备份，按时间倒序（文件名即时间戳） */
+    fun listAutoBackups(context: Context): List<File> =
+        File(context.filesDir, AUTO_DIR)
+            .listFiles { f -> f.name.startsWith(AUTO_PREFIX) && f.name.endsWith(".db") }
+            ?.sortedByDescending { it.name }
+            ?: emptyList()
+
+    /** 自动备份文件的可读标签，如 "09-08 14:30 · 5 条" */
+    fun autoBackupLabel(context: Context, file: File): String {
+        val timePart = file.name.removePrefix(AUTO_PREFIX).removeSuffix(".db")
+        val label = try {
+            val parsed = java.text.SimpleDateFormat("yyyyMMdd_HHmmss", java.util.Locale.US).parse(timePart)
+            java.text.SimpleDateFormat("MM-dd HH:mm", java.util.Locale.getDefault())
+                .format(parsed ?: file.lastModified())
+        } catch (_: Exception) {
+            java.text.SimpleDateFormat("MM-dd HH:mm", java.util.Locale.getDefault())
+                .format(file.lastModified())
+        }
+        val count = inspect(context, android.net.Uri.fromFile(file)).count
+        return "$label · $count 条"
+    }
+
+    /** 从应用私有目录的自动备份文件还原 */
+    fun restoreFromAuto(context: Context, file: File): Result {
+        val check = inspect(context, android.net.Uri.fromFile(file))
+        if (!check.ok) return check
+
+        return try {
+            AppDatabase.closeInstance()
+            val dbPath = context.getDatabasePath(AppDatabase.DB_NAME)
+            listOf(dbPath, File(dbPath.path + "-wal"), File(dbPath.path + "-shm"))
+                .forEach { it.delete() }
+            dbPath.parentFile?.mkdirs()
+            FileInputStream(file).use { input ->
+                FileOutputStream(dbPath).use { output -> input.copyTo(output) }
+            }
+            Result(true, check.count)
+        } catch (e: Exception) {
+            Result(false, message = "还原失败：${e.message}")
+        }
+    }
+
+    /** checkpoint 后把主 db 文件拷到给定输出流 */
+    private fun copyDbTo(context: Context, output: FileOutputStream): Boolean {
+        return try {
+            val db = AppDatabase.get(context)
+            db.openHelper.writableDatabase.query("PRAGMA wal_checkpoint(FULL)").use { it.moveToFirst() }
+            val src = context.getDatabasePath(AppDatabase.DB_NAME)
+            if (!src.exists()) return false
+            FileInputStream(src).use { input -> input.copyTo(output) }
+            true
+        } catch (_: Exception) {
+            false
+        }
+    }
+
+    //endregion
 }

@@ -40,7 +40,7 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:textColor="#1F2430"
+                android:textColor="@color/text_primary"
                 android:textSize="17sp"
                 android:textStyle="bold"
                 android:maxLines="1"
@@ -55,7 +55,7 @@
                 android:paddingStart="7dp"
                 android:paddingEnd="7dp"
                 android:background="@drawable/bg_time_pill"
-                android:textColor="#8A90A5"
+                android:textColor="@color/text_secondary"
                 android:textSize="10sp"
                 android:maxLines="1" />
         </LinearLayout>
@@ -65,7 +65,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="4dp"
-            android:textColor="#6B7183"
+            android:textColor="@color/text_secondary"
             android:textSize="14sp"
             android:maxLines="2"
             android:ellipsize="end" />

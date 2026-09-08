@@ -1,16 +1,35 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <!-- 品牌色（深浅色共用） -->
     <color name="brand_primary">#3F51B5</color>
     <color name="brand_primary_dark">#303F9F</color>
     <color name="brand_accent">#FF7043</color>
+    <color name="ic_launcher_background">#3F51B5</color>
+
+    <!-- 类型标签 / 头像（浅色） -->
     <color name="word_tag_bg">#E8EAF6</color>
     <color name="word_tag_fg">#3949AB</color>
     <color name="sentence_tag_bg">#E8F5E9</color>
     <color name="sentence_tag_fg">#2E7D32</color>
-    <color name="quote_bar">#5D4037</color>
+
+    <!-- 语义色 -->
     <color name="mastered_green">#2E7D32</color>
+    <color name="mastered_green_bg">#E8F5E9</color>
+    <color name="mastered_green_border">#A5D6A7</color>
     <color name="again_orange">#EF6C00</color>
+    <color name="quote_bar">#5D4037</color>
+    <color name="code_bg">#EEEEEE</color>
+    <color name="code_fg">#C2185B</color>
+    <color name="highlight_tap">#66FFB300</color>
+
+    <!-- 界面（浅色） -->
     <color name="screen_bg">#F6F7FB</color>
+    <color name="card_bg">#FFFFFFFF</color>
     <color name="card_border">#E3E5EE</color>
-    <color name="ic_launcher_background">#3F51B5</color>
+    <color name="search_bg">#FFFFFFFF</color>
+    <color name="text_primary">#1F2430</color>
+    <color name="text_secondary">#6B7183</color>
+    <color name="text_disabled">#9AA0B4</color>
+    <color name="chip_text_unselected">#5A6072</color>
+    <color name="time_pill_bg">#F2F4F9</color>
 </resources>

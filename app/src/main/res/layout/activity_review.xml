@@ -29,7 +29,7 @@
         android:layout_height="wrap_content"
         android:layout_gravity="center_horizontal"
         android:layout_marginTop="12dp"
-        android:textColor="#6B7183"
+        android:textColor="@color/text_secondary"
         android:textSize="15sp" />
 
     <!-- 卡片正面 -->
@@ -58,7 +58,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="20dp"
             android:gravity="center"
-            android:textColor="#1F2430"
+            android:textColor="@color/text_primary"
             android:textSize="30sp"
             android:textStyle="bold" />
 
@@ -98,7 +98,7 @@
                     android:id="@+id/textBackTitle"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:textColor="#1F2430"
+                    android:textColor="@color/text_primary"
                     android:textSize="22sp"
                     android:textStyle="bold" />
 
@@ -109,7 +109,7 @@
                     android:layout_marginTop="12dp"
                     android:background="@drawable/bg_card"
                     android:padding="16dp"
-                    android:textColor="#2A2F3C"
+                    android:textColor="@color/text_primary"
                     android:textSize="16sp"
                     android:lineSpacingMultiplier="1.35" />
             </LinearLayout>
@@ -169,7 +169,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/review_done_title"
-            android:textColor="#1F2430"
+            android:textColor="@color/text_primary"
             android:textSize="24sp"
             android:textStyle="bold" />
 
@@ -178,7 +178,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="10dp"
-            android:textColor="#6B7183"
+            android:textColor="@color/text_secondary"
             android:textSize="16sp" />
 
         <com.google.android.material.button.MaterialButton
@@ -198,7 +198,7 @@
         android:gravity="center"
         android:padding="32dp"
         android:text="@string/review_empty"
-        android:textColor="#9AA0B4"
+        android:textColor="@color/text_disabled"
         android:textSize="16sp"
         android:visibility="gone" />
 

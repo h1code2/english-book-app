@@ -50,6 +50,7 @@ class EditEntryActivity : AppCompatActivity() {
 
         binding.btnTemplate.setOnClickListener { insertTemplate() }
         binding.btnSave.setOnClickListener { save() }
+        setupPreviewToggle()
 
         if (isEditMode) {
             val id = intent.getLongExtra(EXTRA_ID, -1L)
@@ -66,6 +67,42 @@ class EditEntryActivity : AppCompatActivity() {
                     }
                 }
             }
+        }
+    }
+
+    /** 编辑 / 预览切换：预览态实时渲染 Markdown，编辑态隐藏预览 */
+    private fun setupPreviewToggle() {
+        binding.toggleMode.addOnButtonCheckedListener { _, checkedId, isChecked ->
+            if (!isChecked) return@addOnButtonCheckedListener
+            if (checkedId == R.id.btnModePreview) {
+                binding.inputContentLayout.isVisible = false
+                binding.textPreview.isVisible = true
+                renderPreview()
+            } else {
+                binding.inputContentLayout.isVisible = true
+                binding.textPreview.isVisible = false
+            }
+        }
+        binding.inputContent.addTextChangedListener(object : android.text.TextWatcher {
+            override fun beforeTextChanged(s: CharSequence?, a: Int, b: Int, c: Int) = Unit
+            override fun onTextChanged(s: CharSequence?, a: Int, b: Int, c: Int) = Unit
+            override fun afterTextChanged(s: android.text.Editable?) {
+                if (binding.textPreview.isVisible) renderPreview()
+            }
+        })
+    }
+
+    private fun renderPreview() {
+        val content = binding.inputContent.text?.toString().orEmpty()
+        binding.textPreview.text = if (content.isBlank()) {
+            getString(R.string.preview_empty)
+        } else {
+            SimpleMarkdownRenderer.render(
+                content,
+                quoteColor = androidx.core.content.ContextCompat.getColor(this, R.color.quote_bar),
+                codeBg = androidx.core.content.ContextCompat.getColor(this, R.color.code_bg),
+                codeFg = androidx.core.content.ContextCompat.getColor(this, R.color.code_fg)
+            )
         }
     }
 

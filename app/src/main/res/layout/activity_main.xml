@@ -49,7 +49,7 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="18dp"
         android:layout_marginTop="6dp"
-        android:textColor="#8A90A5"
+        android:textColor="@color/text_secondary"
         android:textSize="12sp"
         android:visibility="gone" />
 
@@ -103,7 +103,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/empty_title"
-            android:textColor="#9AA0B4"
+            android:textColor="@color/text_disabled"
             android:textSize="17sp"
             android:textStyle="bold" />
 
@@ -113,7 +113,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="6dp"
             android:text="@string/empty_subtitle"
-            android:textColor="#B6BBC9"
+            android:textColor="@color/text_disabled"
             android:textSize="14sp" />
     </LinearLayout>
 

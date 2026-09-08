@@ -47,7 +47,10 @@ class EntryViewModel(app: Application) : AndroidViewModel(app) {
             val now = System.currentTimeMillis()
             val toSave = if (isNew) entry.copy(createdAt = now, updatedAt = now)
             else entry.copy(updatedAt = now)
-            withContext(Dispatchers.IO) { if (isNew) dao.insert(toSave) else dao.update(toSave) }
+            withContext(Dispatchers.IO) {
+                if (isNew) dao.insert(toSave) else dao.update(toSave)
+                org.english.book.data.BackupManager.autoBackup(getApplication())
+            }
             refreshStats()
             mainHandler.post { onDone() }
         }
@@ -55,7 +58,10 @@ class EntryViewModel(app: Application) : AndroidViewModel(app) {
 
     fun delete(entry: EntryEntity, onDone: () -> Unit) {
         viewModelScope.launch {
-            withContext(Dispatchers.IO) { dao.delete(entry) }
+            withContext(Dispatchers.IO) {
+                dao.delete(entry)
+                org.english.book.data.BackupManager.autoBackup(getApplication())
+            }
             refreshStats()
             mainHandler.post { onDone() }
         }
@@ -65,6 +71,7 @@ class EntryViewModel(app: Application) : AndroidViewModel(app) {
         viewModelScope.launch {
             withContext(Dispatchers.IO) {
                 dao.update(entry.copy(mastered = mastered, updatedAt = System.currentTimeMillis()))
+                org.english.book.data.BackupManager.autoBackup(getApplication())
             }
             refreshStats()
         }

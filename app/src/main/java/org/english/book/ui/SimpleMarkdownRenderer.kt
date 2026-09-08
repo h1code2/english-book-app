@@ -62,7 +62,11 @@ object SimpleMarkdownRenderer {
     }
 
     /** 行内样式：加粗 / 斜体 / 行内代码 / 删除线 */
-    fun applyInlineSpans(text: String): SpannableStringBuilder {
+    fun applyInlineSpans(text: String): SpannableStringBuilder =
+        applyInlineSpans(text, Color.parseColor("#EEEEEE"), Color.parseColor("#C2185B"))
+
+    /** 主题感知版本：行内代码的底色/前景色由调用方按当前主题传入 */
+    fun applyInlineSpans(text: String, codeBg: Int, codeFg: Int): SpannableStringBuilder {
         val sb = SpannableStringBuilder(text)
         applyWrapped(sb, Regex("\\*\\*(.+?)\\*\\*")) { start, len ->
             sb.setSpan(StyleSpan(Typeface.BOLD), start, start + len, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
@@ -71,7 +75,7 @@ object SimpleMarkdownRenderer {
             sb.setSpan(StyleSpan(Typeface.ITALIC), start, start + len, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
         }
         applyWrapped(sb, Regex("`([^`]+)`")) { start, len ->
-            sb.setSpan(CodeSpan(), start, start + len, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
+            sb.setSpan(CodeSpan(codeBg, codeFg), start, start + len, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
         }
         applyWrapped(sb, Regex("~~(.+?)~~")) { start, len ->
             sb.setSpan(StrikethroughSpan(), start, start + len, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
@@ -104,12 +108,16 @@ object SimpleMarkdownRenderer {
     }
 
     /** 渲染整段 Markdown 为富文本 */
-    fun render(src: String, quoteColor: Int = Color.parseColor("#5D4037")): CharSequence {
+    fun render(src: String, quoteColor: Int = Color.parseColor("#5D4037")): CharSequence =
+        render(src, quoteColor, Color.parseColor("#EEEEEE"), Color.parseColor("#C2185B"))
+
+    /** 主题感知渲染：引用条、行内代码底色/前景色由调用方按当前主题传入 */
+    fun render(src: String, quoteColor: Int, codeBg: Int, codeFg: Int): CharSequence {
         val out = SpannableStringBuilder()
         parse(src).forEachIndexed { index, block ->
             if (index > 0) out.append("\n\n")
             val start = out.length
-            out.append(applyInlineSpans(block.text))
+            out.append(applyInlineSpans(block.text, codeBg, codeFg))
             val end = out.length
             when (block.kind) {
                 Kind.QUOTE -> out.setSpan(QuoteSpan(quoteColor), start, end, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
@@ -117,15 +125,14 @@ object SimpleMarkdownRenderer {
                 Kind.PARAGRAPH -> Unit
             }
         }
-        // 让引用块文字略小、层次分明
         return out
     }
 
     /** 行内代码样式：等宽字体 + 底色 */
-    class CodeSpan : CharacterStyle() {
+    class CodeSpan(private val bg: Int, private val fg: Int) : CharacterStyle() {
         override fun updateDrawState(ds: TextPaint) {
-            ds.bgColor = Color.parseColor("#EEEEEE")
-            ds.color = Color.parseColor("#C2185B")
+            ds.bgColor = bg
+            ds.color = fg
             ds.typeface = Typeface.MONOSPACE
         }
     }

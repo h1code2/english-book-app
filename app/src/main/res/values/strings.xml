@@ -52,4 +52,10 @@
     <string name="backup_restore_ok">还原成功，共 %1$d 条记录，即将重启应用</string>
     <string name="backup_confirm_title">用备份还原？</string>
     <string name="backup_confirm_msg">备份文件中有 %1$d 条记录。\n\n还原后，当前应用里的所有记录会被备份文件中的内容替换。</string>
+    <string name="tap_word_hint">提示：点按正文中的英文单词可直接朗读</string>
+    <string name="mode_edit">编辑</string>
+    <string name="mode_preview">预览</string>
+    <string name="restore_from_auto">从自动备份恢复</string>
+    <string name="auto_backup_list_empty">还没有自动备份</string>
+    <string name="preview_empty">（暂无内容，切回「编辑」输入）</string>
 </resources>

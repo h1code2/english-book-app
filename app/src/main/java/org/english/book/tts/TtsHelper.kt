@@ -20,10 +20,18 @@ class TtsHelper(context: Context) {
 
     private val listener = TextToSpeech.OnInitListener { status ->
         ready = status == TextToSpeech.SUCCESS
-        if (!ready) {
+        if (ready) {
+            // 引擎就绪后补发初始化期间的待读文本（点词朗读首次触达时常见）
+            pending?.let { text ->
+                pending = null
+                speakNow(text)
+            }
+        } else {
             Toast.makeText(appContext, "当前设备没有可用的语音引擎", Toast.LENGTH_SHORT).show()
         }
     }
+
+    private var pending: String? = null
 
     fun speak(text: String) {
         if (text.isBlank()) return
@@ -31,9 +39,13 @@ class TtsHelper(context: Context) {
             engine = TextToSpeech(appContext, listener)
         }
         if (!ready) {
-            // 引擎初始化中，稍后由用户再次点击触发
+            pending = text
             return
         }
+        speakNow(text)
+    }
+
+    private fun speakNow(text: String) {
         engine?.let { tts ->
             tts.language = when (accent) {
                 Accent.US -> Locale.US

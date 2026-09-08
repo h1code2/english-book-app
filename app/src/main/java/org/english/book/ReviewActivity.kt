@@ -58,6 +58,10 @@ class ReviewActivity : AppCompatActivity() {
         binding.btnSpeakFront.setOnClickListener {
             current()?.let { tts.speak(SpeakText.forEntry(it)) }
         }
+        // 点按闪卡背面中的英文单词即朗读
+        org.english.book.ui.WordTapSpeaker.attach(binding.textBackContent) { word ->
+            tts.speak(word)
+        }
 
         binding.btnReveal.setOnClickListener {
             if (current() != null) showState(State.BACK)
@@ -102,7 +106,12 @@ class ReviewActivity : AppCompatActivity() {
         else R.color.sentence_tag_fg
         binding.textFrontTag.setTextColor(ContextCompat.getColor(this, fgRes))
 
-        binding.textBackContent.text = SimpleMarkdownRenderer.render(entry.content)
+        binding.textBackContent.text = SimpleMarkdownRenderer.render(
+            entry.content,
+            quoteColor = androidx.core.content.ContextCompat.getColor(this, R.color.quote_bar),
+            codeBg = androidx.core.content.ContextCompat.getColor(this, R.color.code_bg),
+            codeFg = androidx.core.content.ContextCompat.getColor(this, R.color.code_fg)
+        )
     }
 
     private enum class State { FRONT, BACK, DONE, EMPTY }

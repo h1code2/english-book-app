@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- 深色模式变体 -->
+
+    <!-- 类型标签 / 头像（深色） -->
+    <color name="word_tag_bg">#2C3050</color>
+    <color name="word_tag_fg">#9FA8FF</color>
+    <color name="sentence_tag_bg">#1F3625</color>
+    <color name="sentence_tag_fg">#81C995</color>
+
+    <!-- 语义色 -->
+    <color name="mastered_green">#81C995</color>
+    <color name="mastered_green_bg">#1F3625</color>
+    <color name="mastered_green_border">#2E5A3C</color>
+    <color name="quote_bar">#D7CCC8</color>
+    <color name="code_bg">#2A2C35</color>
+    <color name="code_fg">#F48FB1</color>
+    <color name="highlight_tap">#66FFB300</color>
+
+    <!-- 界面（深色） -->
+    <color name="screen_bg">#121318</color>
+    <color name="card_bg">#1E2028</color>
+    <color name="card_border">#2A2D38</color>
+    <color name="search_bg">#1E2028</color>
+    <color name="text_primary">#E8EAF2</color>
+    <color name="text_secondary">#A6ACC0</color>
+    <color name="text_disabled">#6E7488</color>
+    <color name="chip_text_unselected">#A6ACC0</color>
+    <color name="time_pill_bg">#262935</color>
+</resources>

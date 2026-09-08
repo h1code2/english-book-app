@@ -58,6 +58,10 @@ class DetailActivity : AppCompatActivity() {
                 getString(if (accent == TtsHelper.Accent.US) R.string.accent_us else R.string.accent_uk)
             entry?.let { tts.speak(SpeakText.forEntry(it)) }
         }
+        // 点按正文中的英文单词即朗读
+        org.english.book.ui.WordTapSpeaker.attach(binding.textContent) { word ->
+            tts.speak(word)
+        }
     }
 
     private fun render(entity: EntryEntity) {
@@ -73,7 +77,12 @@ class DetailActivity : AppCompatActivity() {
         binding.textTypeTag.setTextColor(
             androidx.core.content.ContextCompat.getColor(this, fgRes)
         )
-        binding.textContent.text = SimpleMarkdownRenderer.render(entity.content)
+        binding.textContent.text = SimpleMarkdownRenderer.render(
+            entity.content,
+            quoteColor = androidx.core.content.ContextCompat.getColor(this, R.color.quote_bar),
+            codeBg = androidx.core.content.ContextCompat.getColor(this, R.color.code_bg),
+            codeFg = androidx.core.content.ContextCompat.getColor(this, R.color.code_fg)
+        )
         binding.textContent.isVisible = entity.content.isNotBlank()
     }
 

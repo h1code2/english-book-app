@@ -202,15 +202,73 @@ class MainActivity : AppCompatActivity() {
     private fun showBackupDialog() {
         val items = arrayOf(
             getString(R.string.backup_export),
-            getString(R.string.backup_import)
+            getString(R.string.backup_import),
+            getString(R.string.restore_from_auto)
         )
         MaterialAlertDialogBuilder(this)
             .setTitle(R.string.action_backup)
             .setItems(items) { _, which ->
-                if (which == 0) launchExport() else launchImport()
+                when (which) {
+                    0 -> launchExport()
+                    1 -> launchImport()
+                    2 -> showAutoBackupDialog()
+                }
             }
             .setNegativeButton(R.string.action_cancel, null)
             .show()
+    }
+
+    private fun showAutoBackupDialog() {
+        lifecycleScope.launch {
+            val backups = withContext(Dispatchers.IO) {
+                BackupManager.listAutoBackups(applicationContext)
+            }
+            if (backups.isEmpty()) {
+                Toast.makeText(this@MainActivity, R.string.auto_backup_list_empty, Toast.LENGTH_SHORT).show()
+                return@launch
+            }
+            val labels = backups.map {
+                BackupManager.autoBackupLabel(applicationContext, it)
+            }.toTypedArray()
+            MaterialAlertDialogBuilder(this@MainActivity)
+                .setTitle(R.string.restore_from_auto)
+                .setItems(labels) { _, which ->
+                    val file = backups[which]
+                    lifecycleScope.launch {
+                        val check = withContext(Dispatchers.IO) {
+                            BackupManager.inspect(applicationContext, Uri.fromFile(file))
+                        }
+                        if (!check.ok) {
+                            Toast.makeText(this@MainActivity, check.message, Toast.LENGTH_LONG).show()
+                            return@launch
+                        }
+                        MaterialAlertDialogBuilder(this@MainActivity)
+                            .setTitle(R.string.backup_confirm_title)
+                            .setMessage(getString(R.string.backup_confirm_msg, check.count))
+                            .setPositiveButton(R.string.action_ok) { _, _ ->
+                                lifecycleScope.launch {
+                                    val result = withContext(Dispatchers.IO) {
+                                        BackupManager.restoreFromAuto(applicationContext, file)
+                                    }
+                                    if (result.ok) {
+                                        Toast.makeText(
+                                            this@MainActivity,
+                                            getString(R.string.backup_restore_ok, result.count),
+                                            Toast.LENGTH_LONG
+                                        ).show()
+                                        restartApp()
+                                    } else {
+                                        Toast.makeText(this@MainActivity, result.message, Toast.LENGTH_LONG).show()
+                                    }
+                                }
+                            }
+                            .setNegativeButton(R.string.action_cancel, null)
+                            .show()
+                    }
+                }
+                .setNegativeButton(R.string.action_cancel, null)
+                .show()
+        }
     }
 
     private val exportLauncher =
