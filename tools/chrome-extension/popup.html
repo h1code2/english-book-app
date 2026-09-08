@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <style>
+    body { width: 320px; margin: 0; font-family: -apple-system, 'PingFang SC', sans-serif; background: #F6F7FB; }
+    header { background: #3F51B5; color: #fff; padding: 10px 14px; font-size: 14px; font-weight: 600; }
+    main { padding: 12px 14px; }
+    textarea { width: 100%; box-sizing: border-box; height: 110px; border: 1px solid #E3E5EE; border-radius: 8px;
+               padding: 8px; font-size: 13px; resize: vertical; }
+    .row { display: flex; align-items: center; gap: 8px; margin-top: 10px; }
+    select { flex: 1; padding: 6px; border: 1px solid #E3E5EE; border-radius: 8px; font-size: 13px; }
+    button { background: #3F51B5; color: #fff; border: none; border-radius: 8px; padding: 8px 14px;
+             font-size: 13px; cursor: pointer; }
+    button.secondary { background: #fff; color: #3F51B5; border: 1px solid #3F51B5; }
+    #status { margin-top: 10px; font-size: 12px; color: #6B7183; min-height: 16px; }
+    #status.ok { color: #2E7D32; }
+    #status.err { color: #C62828; }
+    .link { font-size: 12px; color: #3F51B5; cursor: pointer; text-decoration: underline; }
+  </style>
+</head>
+<body>
+  <header>推送到英语笔记本</header>
+  <main>
+    <textarea id="text" placeholder="粘贴或输入内容…&#10;第一行将作为标题（单词 / 句子）"></textarea>
+    <div class="row">
+      <select id="type">
+        <option value="auto">自动判断类型</option>
+        <option value="word">单词</option>
+        <option value="sentence">句子</option>
+      </select>
+      <button id="send">推送</button>
+    </div>
+    <div class="row">
+      <span id="status"></span>
+      <span style="flex:1"></span>
+      <span class="link" id="openOptions">设置</span>
+    </div>
+  </main>
+  <script src="common.js"></script>
+  <script src="popup.js"></script>
+</body>
+</html>

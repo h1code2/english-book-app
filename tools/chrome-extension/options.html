@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <style>
+    body { width: 380px; margin: 0; font-family: -apple-system, 'PingFang SC', sans-serif; background: #F6F7FB; }
+    header { background: #3F51B5; color: #fff; padding: 10px 14px; font-size: 14px; font-weight: 600; }
+    main { padding: 14px; }
+    label { display: block; font-size: 12px; color: #6B7183; margin: 10px 0 4px; }
+    input { width: 100%; box-sizing: border-box; padding: 8px; border: 1px solid #E3E5EE;
+            border-radius: 8px; font-size: 13px; }
+    .row { display: flex; gap: 10px; margin-top: 14px; }
+    button { background: #3F51B5; color: #fff; border: none; border-radius: 8px;
+             padding: 9px 16px; font-size: 13px; cursor: pointer; }
+    button.secondary { background: #fff; color: #3F51B5; border: 1px solid #3F51B5; }
+    #status { margin-top: 12px; font-size: 12px; color: #6B7183; min-height: 16px; }
+    #status.ok { color: #2E7D32; }
+    #status.err { color: #C62828; }
+    .hint { font-size: 11px; color: #9AA0B4; margin-top: 12px; line-height: 1.6; }
+  </style>
+</head>
+<body>
+  <header>设置 · 英语笔记本推送</header>
+  <main>
+    <label>手机 IP 地址（应用「电脑同步」页查看）</label>
+    <input id="ip" placeholder="192.168.1.100">
+    <label>端口</label>
+    <input id="port" value="8765">
+    <label>令牌</label>
+    <input id="token" placeholder="应用上显示的 6 位令牌" maxlength="8">
+    <div class="row">
+      <button class="secondary" id="test">测试连接</button>
+      <button id="save">保存</button>
+    </div>
+    <div id="status"></div>
+    <div class="hint">
+      1. 手机打开「英语笔记本」→ 右上角菜单 → 电脑同步<br>
+      2. 开启「电脑推送接收」，把显示的地址和令牌填到这里<br>
+      3. 手机与电脑需在同一 Wi-Fi，推送时保持手机应用在前台
+    </div>
+  </main>
+  <script src="common.js"></script>
+  <script src="options.js"></script>
+</body>
+</html>

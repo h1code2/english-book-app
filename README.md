@@ -17,6 +17,7 @@
 - **Markdown 预览**：编辑页可在「编辑 / 预览」间切换，录入时实时查看排版效果
 - **复习**：闪卡模式（可复习全部或只复习未掌握）——正面只显示单词或句子，翻面看完整内容，「已掌握 / 再看看」记录掌握状态并持久化
 - **备份 / 还原**：数据保存在 SQLite 数据库文件（`english_notebook.db`）；可一键导出为 `.db` 文件（任意设备/工具可读），也可从备份文件还原（还原前校验文件合法性并二次确认，完成后自动重启应用）
+- **电脑推送**：内置局域网接收服务，配合 Chrome 扩展，网页上选中单词 / 句子右键即推送到手机（见下文「电脑推送到手机」）
 - **自动备份**：每次修改数据后自动在应用私有目录留一份备份（保留最近 7 份），可在备份对话框中一键从自动备份恢复
 - **深色模式**：跟随系统深色 / 浅色模式
 - **首次启动**自动预置 4 条示例（wallet、summer、两个例句）
@@ -49,12 +50,12 @@ export GRADLE_USER_HOME="$PWD/.gradle-home"
 adb install -r app/build/outputs/apk/debug/app-debug.apk
 ```
 
-产物：`app/build/outputs/apk/debug/app-debug.apk`（根目录 `EnglishNotebook-v1.1-debug.apk` 为同一文件的副本）
+产物：`app/build/outputs/apk/debug/app-debug.apk`（根目录 `EnglishNotebook-v*-release.apk` 为发布副本）
 
 ## 项目结构
 
 ```
-app/src/main/java/org/english/book/
+app/src/main/java/org/h1code2/english/notebook/
 ├── MainActivity.kt          # 列表：搜索、筛选、入口
 ├── EditEntryActivity.kt     # 新增 / 编辑 + 模板插入
 ├── DetailActivity.kt        # 详情：Markdown 渲染 + TTS
@@ -72,6 +73,21 @@ app/src/main/java/org/english/book/
 - `debug.keystore`：项目内 debug 签名（构建沙箱不允许写 `~/.android`）
 - `.gradle-home/`：预填的 Gradle 发行版与依赖缓存（`GRADLE_USER_HOME` 指向它）
 - `.android-home/`：AVD 的工作区克隆（模拟器验证用，约 8.8 GB，不需要可整目录删除）
+
+## 电脑推送到手机（Chrome 扩展）
+
+在电脑浏览器上看到单词 / 句子，几秒推送到手机：
+
+**一次性配置**
+1. 手机：右上角菜单 → 「电脑同步」→ 打开「开启电脑推送接收」，记下显示的 **服务地址** 与 **6 位令牌**
+2. 电脑 Chrome：`chrome://extensions` → 开发者模式 → 「加载已解压的扩展程序」→ 选择仓库里的 `tools/chrome-extension` 目录（或从 Release 下载 zip 解压）
+3. 扩展图标右键 → 「选项」→ 填入地址与令牌 → **测试连接** 显示成功
+
+**日常使用**
+- 网页选中文字 → 右键 → 「推送到英语笔记本」（自动判断单词 / 句子，重复自动跳过）
+- 或点扩展图标 → 弹窗中粘贴 / 编辑 → 推送
+
+注意：手机与电脑需在同一 Wi-Fi；推送时保持手机应用在前台（接收服务以前台通知形式运行）。
 
 ## 数据与备份
 

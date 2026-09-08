@@ -1,0 +1,26 @@
+{
+  "manifest_version": 3,
+  "name": "英语笔记本推送",
+  "version": "1.0.0",
+  "description": "把网页上看到的单词 / 句子一键推送到手机「英语笔记本」应用。",
+  "permissions": ["contextMenus", "storage", "notifications", "scripting", "activeTab"],
+  "host_permissions": ["http://*/*"],
+  "background": {
+    "service_worker": "background.js"
+  },
+  "action": {
+    "default_popup": "popup.html",
+    "default_title": "推送到英语笔记本",
+    "default_icon": {
+      "16": "icons/icon16.png",
+      "48": "icons/icon48.png",
+      "128": "icons/icon128.png"
+    }
+  },
+  "options_page": "options.html",
+  "icons": {
+    "16": "icons/icon16.png",
+    "48": "icons/icon48.png",
+    "128": "icons/icon128.png"
+  }
+}

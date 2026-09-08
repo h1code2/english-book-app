@@ -66,6 +66,10 @@ interface EntryDao {
     @Query("SELECT COUNT(*) FROM entries WHERE mastered = 1")
     suspend fun masteredCount(): Int
 
+    /** 电脑推送去重：同标题同类型视为重复 */
+    @Query("SELECT COUNT(*) FROM entries WHERE title = :title AND type = :type")
+    suspend fun countSameTitle(title: String, type: String): Int
+
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insert(entry: EntryEntity): Long
 

@@ -156,6 +156,10 @@ class MainActivity : AppCompatActivity() {
                 showBackupDialog()
                 true
             }
+            R.id.action_sync_pc -> {
+                startActivity(android.content.Intent(this, org.h1code2.english.notebook.SyncActivity::class.java))
+                true
+            }
             else -> super.onOptionsItemSelected(item)
         }
     }
