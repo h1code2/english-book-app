@@ -155,17 +155,20 @@ class SyncServerService : Service() {
             }
         }
 
-        /** 取局域网 IPv4（优先 192.168 段） */
+        /** 取局域网 IPv4：按常见网段优先级回退，避免个别路由器网段（如 100.x CGNAT）检测不到 */
         fun localIp(): String? {
-            val candidates = NetworkInterface.getNetworkInterfaces().asSequence()
+            val ips = NetworkInterface.getNetworkInterfaces().asSequence()
                 .filter { it.isUp && !it.isLoopback }
                 .flatMap { it.inetAddresses.asSequence() }
                 .filterIsInstance<java.net.Inet4Address>()
-                .filter { !it.isLoopbackAddress && it.isSiteLocalAddress }
+                .filter { !it.isLoopbackAddress && !it.isLinkLocalAddress }
                 .map { it.hostAddress }
                 .toList()
-            return candidates.firstOrNull { it.startsWith("192.168.") }
-                ?: candidates.firstOrNull()
+            return ips.firstOrNull { it.startsWith("192.168.") }     // 家用路由常见
+                ?: ips.firstOrNull { it.startsWith("10.") }          // 部分路由 / 模拟器
+                ?: ips.firstOrNull { it.startsWith("172.") }         // 172.16-31 私网段
+                ?: ips.firstOrNull { it.startsWith("100.") }         // CGNAT（部分运营商 / 热点）
+                ?: ips.firstOrNull()                                  // 兜底：任意非回环 IPv4
         }
 
         fun appendLog(context: Context, title: String) {

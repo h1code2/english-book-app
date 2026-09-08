@@ -69,13 +69,18 @@ class SyncActivity : AppCompatActivity() {
         }
 
         val port = SyncServerService.actualPort
-        val ip = SyncServerService.localIp() ?: "未接入 Wi-Fi"
+        val ip = SyncServerService.localIp()
         val token = prefs.getString(SyncServerService.KEY_TOKEN, "") ?: ""
-        binding.textAddress.text = getString(R.string.sync_address_fmt, ip, port)
+        binding.textAddress.text = if (ip != null) {
+            getString(R.string.sync_address_fmt, ip, port)
+        } else {
+            getString(R.string.sync_address_unknown, port)
+        }
         binding.textToken.text = token
 
         binding.textStatus.text = when {
-            running -> getString(R.string.sync_running_fmt, ip, port)
+            running && ip != null -> getString(R.string.sync_running_fmt, ip, port)
+            running -> getString(R.string.sync_running_nolocal, port)
             else -> getString(R.string.sync_disabled)
         }
 

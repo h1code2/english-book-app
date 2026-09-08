@@ -53,6 +53,8 @@
     <string name="sync_disabled">未开启</string>
     <string name="sync_running_fmt">接收中：%1$s:%2$d</string>
     <string name="sync_address_fmt">服务地址：http://%1$s:%2$d</string>
+    <string name="sync_address_unknown">服务地址：未检测到局域网 IP（端口 %1$d）\n可在手机 设置 → WLAN → 当前网络 里查看本机 IP，手动填入扩展</string>
+    <string name="sync_running_nolocal">接收中（端口 %1$d）· 未能识别本机局域网 IP，不影响已配置的连接</string>
     <string name="sync_conn_title">连接信息</string>
     <string name="sync_regenerate">重新生成</string>
     <string name="sync_token_regen_restart">令牌已更新；服务运行中请关闭后重新开启以生效</string>
