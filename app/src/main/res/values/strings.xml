@@ -26,6 +26,7 @@
     <string name="review_empty">没有可复习的内容，先去添加几条吧</string>
     <string name="delete_confirm_title">删除这条记录？</string>
     <string name="action_ok">删除</string>
+    <string name="action_restore">还原</string>
     <string name="action_cancel">取消</string>
     <string name="title_required">请先填写单词或句子</string>
     <string name="saved">已保存</string>

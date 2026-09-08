@@ -254,7 +254,7 @@ class MainActivity : AppCompatActivity() {
                         MaterialAlertDialogBuilder(this@MainActivity)
                             .setTitle(R.string.backup_confirm_title)
                             .setMessage(getString(R.string.backup_confirm_msg, check.count))
-                            .setPositiveButton(R.string.action_ok) { _, _ ->
+                            .setPositiveButton(R.string.action_restore) { _, _ ->
                                 lifecycleScope.launch {
                                     val result = withContext(Dispatchers.IO) {
                                         BackupManager.restoreFromAuto(applicationContext, file)
@@ -316,7 +316,7 @@ class MainActivity : AppCompatActivity() {
                 MaterialAlertDialogBuilder(this@MainActivity)
                     .setTitle(R.string.backup_confirm_title)
                     .setMessage(getString(R.string.backup_confirm_msg, check.count))
-                    .setPositiveButton(R.string.action_ok) { _, _ ->
+                    .setPositiveButton(R.string.action_restore) { _, _ ->
                         lifecycleScope.launch {
                             val result = withContext(Dispatchers.IO) {
                                 BackupManager.restore(applicationContext, uri)
