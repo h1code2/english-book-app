@@ -17,4 +17,9 @@
         <item name="android:textSize">14sp</item>
         <item name="android:textColor">@color/chip_text</item>
     </style>
+
+    <!-- 工具栏作用域覆盖：溢出菜单「⋮」等框架图标在品牌蓝底上保持白色 -->
+    <style name="ThemeOverlay.EnglishNotebook.Toolbar" parent="">
+        <item name="colorControlNormal">@android:color/white</item>
+    </style>
 </resources>
