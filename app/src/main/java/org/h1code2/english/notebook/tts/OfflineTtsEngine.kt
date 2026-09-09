@@ -93,6 +93,7 @@ object OfflineTtsEngine {
      */
     fun speak(context: Context, text: String, speed: Float = 1.0f, onDone: ((Boolean) -> Unit)? = null) {
         executor.execute {
+            cancelled = false
             val engine = obtain(context.applicationContext)
             if (engine == null) {
                 onDone?.invoke(false)
@@ -114,16 +115,18 @@ object OfflineTtsEngine {
     @Volatile
     private var track: AudioTrack? = null
 
+    @Volatile
+    private var cancelled = false
+
     fun stop() {
+        cancelled = true
         track?.let {
             try {
                 it.pause()
                 it.flush()
-                it.release()
             } catch (_: Exception) {
             }
         }
-        track = null
     }
 
     private fun play(audio: GeneratedAudio) {
@@ -133,6 +136,7 @@ object OfflineTtsEngine {
             android.media.AudioFormat.CHANNEL_OUT_MONO,
             android.media.AudioFormat.ENCODING_PCM_16BIT
         )
+        // 缓冲开到 PCM 全长：一次性写入全部数据再播放，杜绝 underrun
         val t = AudioTrack.Builder()
             .setAudioAttributes(
                 AudioAttributes.Builder()
@@ -148,11 +152,38 @@ object OfflineTtsEngine {
                     .build()
             )
             .setBufferSizeInBytes(maxOf(minBuf, pcm.size))
-            .setTransferMode(android.media.AudioTrack.MODE_STATIC)
+            .setTransferMode(android.media.AudioTrack.MODE_STREAM)
             .build()
         track = t
-        t.write(pcm, 0, pcm.size)
-        t.play()
+        try {
+            val written = t.write(pcm, 0, pcm.size)
+            if (written != pcm.size) {
+                Log.w(TAG, "write 不完整: $written/${pcm.size}")
+            }
+            t.play()
+            // 分片等待播放完成，期间可被 stop() 打断（快速连点不叠音）
+            val durationMs = pcm.size * 1000L / (audio.sampleRate * 2)
+            var waited = 0L
+            while (waited < durationMs + 150 && !cancelled) {
+                Thread.sleep(100)
+                waited += 100
+            }
+        } finally {
+            try {
+                t.pause()
+                t.flush()
+            } catch (_: Exception) {
+            }
+            try {
+                t.stop()
+            } catch (_: Exception) {
+            }
+            try {
+                t.release()
+            } catch (_: Exception) {
+            }
+            if (track === t) track = null
+        }
     }
 
     private fun toPcm16(samples: FloatArray): ByteArray {

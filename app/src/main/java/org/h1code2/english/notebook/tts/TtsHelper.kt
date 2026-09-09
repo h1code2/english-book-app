@@ -43,11 +43,16 @@ class TtsHelper(context: Context) {
 
     private var pending: String? = null
 
+    /** 系统引擎链全部失败、已自动落离线 */
+    @Volatile
+    private var offlineFallback = false
+
     fun forceMode(newMode: Mode) {
         mode = newMode
         if (newMode == Mode.OFFLINE) {
             engineLabel = "内置离线（美音）"
         } else {
+            offlineFallback = false
             engineLabel = ""
             ready = false
             triedEngines.clear()
@@ -63,7 +68,11 @@ class TtsHelper(context: Context) {
             } catch (_: Exception) {
                 TextToSpeech.LANG_NOT_SUPPORTED
             }
+            // LANG_AVAILABLE 之上才认为真正可发音；MISSING_DATA（如缺语音包）不可用
             systemUsableForEnglish = avail >= TextToSpeech.LANG_AVAILABLE
+            if (!systemUsableForEnglish) {
+                android.util.Log.w("TtsHelper", "系统引擎对 en-US 不可用: $avail (2=MISSING_DATA)")
+            }
         }
 
         if (status == TextToSpeech.SUCCESS && systemUsableForEnglish) {
@@ -78,6 +87,7 @@ class TtsHelper(context: Context) {
 
         // 失败 → 尝试其他已安装引擎 → 全失败落离线
         if (!tryNextSystemEngine()) {
+            offlineFallback = true
             if (mode == Mode.AUTO) {
                 engineLabel = "内置离线（美音）"
                 Toast.makeText(appContext, R.string.tts_using_offline, Toast.LENGTH_LONG).show()
@@ -112,7 +122,8 @@ class TtsHelper(context: Context) {
 
     fun speak(text: String) {
         if (text.isBlank()) return
-        if (mode == Mode.OFFLINE) {
+        // 离线兜底已生效（或强制离线）：直接离线合成，不再走系统引擎队列
+        if (mode == Mode.OFFLINE || offlineFallback) {
             OfflineTtsEngine.stop()
             OfflineTtsEngine.speak(appContext, text)
             return
