@@ -58,9 +58,36 @@ class DetailActivity : AppCompatActivity() {
                 getString(if (accent == TtsHelper.Accent.US) R.string.accent_us else R.string.accent_uk)
             entry?.let { tts.speak(SpeakText.forEntry(it)) }
         }
+        // 长按口音按钮：切换 自动（系统优先）/ 强制内置离线 引擎
+        binding.btnAccent.setOnLongClickListener {
+            val newMode = if (tts.mode == TtsHelper.Mode.OFFLINE) TtsHelper.Mode.AUTO
+            else TtsHelper.Mode.OFFLINE
+            tts.forceMode(newMode)
+            updateEngineUi()
+            Toast.makeText(
+                this,
+                if (newMode == TtsHelper.Mode.OFFLINE) R.string.tts_switched_offline else R.string.tts_switched_auto,
+                Toast.LENGTH_SHORT
+            ).show()
+            true
+        }
         // 点按正文中的英文单词即朗读
         org.h1code2.english.notebook.ui.WordTapSpeaker.attach(binding.textContent) { word ->
             tts.speak(word)
+        }
+        updateEngineUi()
+    }
+
+    private fun updateEngineUi() {
+        if (tts.mode == TtsHelper.Mode.OFFLINE || tts.engineLabel.startsWith("内置")) {
+            binding.btnAccent.text = getString(R.string.tts_engine_offline_label)
+            binding.btnAccent.isEnabled = false
+            binding.btnAccent.alpha = 0.6f
+        } else {
+            binding.btnAccent.isEnabled = true
+            binding.btnAccent.alpha = 1f
+            binding.btnAccent.text =
+                getString(if (tts.accent == TtsHelper.Accent.US) R.string.accent_us else R.string.accent_uk)
         }
     }
 

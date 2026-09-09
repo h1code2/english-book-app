@@ -68,6 +68,10 @@
     <string name="backup_confirm_title">用备份还原？</string>
     <string name="backup_confirm_msg">备份文件中有 %1$d 条记录。\n\n还原后，当前应用里的所有记录会被备份文件中的内容替换。</string>
     <string name="tap_word_hint">提示：点按正文中的英文单词可直接朗读</string>
+    <string name="tts_using_offline">当前设备无系统语音引擎，已切换到内置离线语音</string>
+    <string name="tts_engine_offline_label">内置</string>
+    <string name="tts_switched_offline">已切换为内置离线语音（美音）</string>
+    <string name="tts_switched_auto">已切换为自动选择引擎</string>
     <string name="mode_edit">编辑</string>
     <string name="mode_preview">预览</string>
     <string name="restore_from_auto">从自动备份恢复</string>

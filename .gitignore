@@ -13,3 +13,5 @@ captures/
 *.apk
 *.keystore
 keystore.properties
+app/libs/*.aar
+app/src/main/assets/tts/
