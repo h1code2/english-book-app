@@ -68,8 +68,8 @@ android {
         applicationId = "org.h1code2.english.notebook"
         minSdk = 26
         targetSdk = 34
-        versionCode = 12
-        versionName = "1.6.3"
+        versionCode = 13
+        versionName = "1.8.0"
 
         // 只保留主流 ABI（x86/x86_64 仅模拟器调试用，会显著增大 APK）
         ndk {
