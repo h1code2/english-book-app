@@ -91,7 +91,7 @@ object OfflineTtsEngine {
      * 合成并播放。异步执行；返回结果经 [onDone] 回调（主线程外）。
      * @return false 表示引擎不可用或合成失败
      */
-    fun speak(context: Context, text: String, speed: Float = 1.0f, onDone: ((Boolean) -> Unit)? = null) {
+    fun speak(context: Context, text: String, speed: Float, onDone: ((Boolean) -> Unit)? = null) {
         executor.execute {
             cancelled = false
             val engine = obtain(context.applicationContext)

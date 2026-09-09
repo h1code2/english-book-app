@@ -160,6 +160,10 @@ class MainActivity : AppCompatActivity() {
                 startActivity(android.content.Intent(this, org.h1code2.english.notebook.SyncActivity::class.java))
                 true
             }
+            R.id.action_settings -> {
+                startActivity(android.content.Intent(this, org.h1code2.english.notebook.SettingsActivity::class.java))
+                true
+            }
             else -> super.onOptionsItemSelected(item)
         }
     }

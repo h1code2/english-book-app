@@ -24,6 +24,10 @@
         android:title="@string/action_sync_pc"
         app:showAsAction="never" />
     <item
+        android:id="@+id/action_settings"
+        android:title="@string/action_settings"
+        app:showAsAction="never" />
+    <item
         android:id="@+id/action_review"
         android:title="@string/menu_review"
         android:icon="@drawable/ic_review_alt"

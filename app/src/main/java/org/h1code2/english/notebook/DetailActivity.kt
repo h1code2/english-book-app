@@ -62,7 +62,7 @@ class DetailActivity : AppCompatActivity() {
         binding.btnAccent.setOnLongClickListener {
             val newMode = if (tts.mode == TtsHelper.Mode.OFFLINE) TtsHelper.Mode.AUTO
             else TtsHelper.Mode.OFFLINE
-            tts.forceMode(newMode)
+            tts.setMode(newMode)
             updateEngineUi()
             Toast.makeText(
                 this,

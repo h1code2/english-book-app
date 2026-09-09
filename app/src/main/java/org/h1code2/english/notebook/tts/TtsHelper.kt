@@ -1,6 +1,7 @@
 package org.h1code2.english.notebook.tts
 
 import android.content.Context
+import android.content.SharedPreferences
 import android.speech.tts.TextToSpeech
 import android.widget.Toast
 import org.h1code2.english.notebook.R
@@ -22,6 +23,8 @@ class TtsHelper(context: Context) {
     enum class Mode { AUTO, OFFLINE }
 
     private val appContext = context.applicationContext
+    private val prefs: SharedPreferences =
+        appContext.getSharedPreferences("tts_prefs", Context.MODE_PRIVATE)
     private var engine: TextToSpeech? = null
     private var ready = false
     private var systemUsableForEnglish = false
@@ -36,12 +39,36 @@ class TtsHelper(context: Context) {
     var accent: Accent = Accent.US
         private set
 
-    /** AUTO = 系统优先离线兜底；OFFLINE = 强制离线 */
+    /** AUTO = 系统优先离线兜底；OFFLINE = 强制离线（持久化于设置） */
     @Volatile
-    var mode: Mode = Mode.AUTO
+    var mode: Mode = TtsSettingsLogic.modeFrom(
+        context.getSharedPreferences("tts_prefs", Context.MODE_PRIVATE)
+            .getString(KEY_ENGINE, TtsSettingsLogic.ENGINE_AUTO)
+    )
+        private set
+
+    /** 全局语速（持久化），系统与离线引擎共用 */
+    @Volatile
+    var speechRate: Float = TtsSettingsLogic.clampRate(
+        context.getSharedPreferences("tts_prefs", Context.MODE_PRIVATE)
+            .getFloat(KEY_RATE, TtsSettingsLogic.RATE_DEFAULT)
+    )
         private set
 
     private var pending: String? = null
+
+    /** 设置页调用：切换引擎并持久化 */
+    fun setMode(newMode: Mode) {
+        forceMode(newMode)
+        prefs.edit().putString(KEY_ENGINE, TtsSettingsLogic.modeKey(newMode)).apply()
+    }
+
+    /** 设置页调用：调整语速并持久化（打断当前播放，下次发音生效） */
+    fun setSpeechRate(rate: Float) {
+        speechRate = TtsSettingsLogic.clampRate(rate)
+        prefs.edit().putFloat(KEY_RATE, speechRate).apply()
+        OfflineTtsEngine.stop()
+    }
 
     /** 系统引擎链全部失败、已自动落离线 */
     @Volatile
@@ -125,7 +152,7 @@ class TtsHelper(context: Context) {
         // 离线兜底已生效（或强制离线）：直接离线合成，不再走系统引擎队列
         if (mode == Mode.OFFLINE || offlineFallback) {
             OfflineTtsEngine.stop()
-            OfflineTtsEngine.speak(appContext, text)
+            OfflineTtsEngine.speak(appContext, text, speechRate)
             return
         }
         if (engine == null) initSystemEngine()
@@ -139,24 +166,24 @@ class TtsHelper(context: Context) {
     private fun flushPendingOffline() {
         pending?.let { text ->
             pending = null
-            OfflineTtsEngine.speak(appContext, text)
+            OfflineTtsEngine.speak(appContext, text, speechRate)
         }
     }
 
     private fun speakNow(text: String) {
         val tts = engine ?: run {
-            OfflineTtsEngine.speak(appContext, text)
+            OfflineTtsEngine.speak(appContext, text, speechRate)
             return
         }
         if (mode == Mode.AUTO && !systemUsableForEnglish) {
-            OfflineTtsEngine.speak(appContext, text)
+            OfflineTtsEngine.speak(appContext, text, speechRate)
             return
         }
         tts.language = when (accent) {
             Accent.US -> Locale.US
             Accent.UK -> Locale.UK
         }
-        tts.setSpeechRate(0.95f)
+        tts.setSpeechRate(speechRate)
         tts.speak(text, TextToSpeech.QUEUE_FLUSH, null, "english_notebook_$accent")
     }
 
@@ -174,5 +201,10 @@ class TtsHelper(context: Context) {
         engine = null
         ready = false
         OfflineTtsEngine.stop()
+    }
+
+    companion object {
+        const val KEY_ENGINE = "engine_mode"
+        const val KEY_RATE = "speech_rate"
     }
 }
