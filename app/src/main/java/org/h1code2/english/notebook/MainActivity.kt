@@ -1,29 +1,23 @@
 package org.h1code2.english.notebook
 
 import android.content.Intent
-import android.net.Uri
+import android.content.Context
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
 import android.view.Menu
 import android.view.MenuItem
-import android.widget.Toast
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.core.view.isVisible
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
-import org.h1code2.english.notebook.data.BackupManager
 import org.h1code2.english.notebook.data.EntryType
 import org.h1code2.english.notebook.data.ListFilter
 import org.h1code2.english.notebook.data.SortMode
+import org.h1code2.english.notebook.R
 import org.h1code2.english.notebook.databinding.ActivityMainBinding
 import org.h1code2.english.notebook.tts.TtsHelper
-import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
@@ -38,10 +32,16 @@ class MainActivity : AppCompatActivity() {
     private val filter = ListFilter()
     private val sortModes = listOf(SortMode.RECENT, SortMode.NEWEST, SortMode.TITLE_ASC, SortMode.TITLE_DESC)
 
+    private val listPrefs by lazy {
+        getSharedPreferences("list_prefs", Context.MODE_PRIVATE)
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
+
+        filter.onlyLearning = listPrefs.getBoolean("only_learning", false)
 
         viewModel = ViewModelProvider(this)[EntryViewModel::class.java]
 
@@ -127,37 +127,8 @@ class MainActivity : AppCompatActivity() {
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         return when (item.itemId) {
-            R.id.action_review -> {
-                showReviewModeDialog()
-                true
-            }
             R.id.action_sort -> {
                 showSortDialog()
-                true
-            }
-            R.id.action_learning -> {
-                filter.onlyLearning = !filter.onlyLearning
-                item.setIcon(
-                    if (filter.onlyLearning) R.drawable.ic_school_checked else R.drawable.ic_school
-                )
-                // 选中态用金色：menu XML 的 iconTint(白) 会覆盖新 icon 自带颜色，这里同步纠正
-                item.setIconTintList(
-                    android.content.res.ColorStateList.valueOf(
-                        androidx.core.content.ContextCompat.getColor(
-                            this,
-                            if (filter.onlyLearning) R.color.again_orange else android.R.color.white
-                        )
-                    )
-                )
-                applyFilter()
-                true
-            }
-            R.id.action_backup -> {
-                showBackupDialog()
-                true
-            }
-            R.id.action_sync_pc -> {
-                startActivity(android.content.Intent(this, org.h1code2.english.notebook.SyncActivity::class.java))
                 true
             }
             R.id.action_settings -> {
@@ -166,21 +137,6 @@ class MainActivity : AppCompatActivity() {
             }
             else -> super.onOptionsItemSelected(item)
         }
-    }
-
-    private fun showReviewModeDialog() {
-        val items = arrayOf(
-            getString(R.string.review_mode_all),
-            getString(R.string.review_mode_learning)
-        )
-        MaterialAlertDialogBuilder(this)
-            .setTitle(R.string.menu_review)
-            .setItems(items) { _, which ->
-                startActivity(
-                    ReviewActivity.intent(this, if (which == 0) "all" else "learning")
-                )
-            }
-            .show()
     }
 
     private fun showSortDialog() {
@@ -203,171 +159,15 @@ class MainActivity : AppCompatActivity() {
             .show()
     }
 
-    //region 备份 / 还原
-
-    private fun maybeRequestPersistable(uri: Uri) {
-        try {
-            contentResolver.takePersistableUriPermission(
-                uri,
-                Intent.FLAG_GRANT_READ_URI_PERMISSION or Intent.FLAG_GRANT_WRITE_URI_PERMISSION
-            )
-        } catch (_: SecurityException) {
-            // 非持久化授权（例如某些提供方），导出导入一次性进行，不影响功能
+    override fun onResume() {
+        super.onResume()
+        // 设置页可能改了「只看未掌握」，回来时同步
+        val pref = listPrefs.getBoolean("only_learning", false)
+        if (pref != filter.onlyLearning) {
+            filter.onlyLearning = pref
+            applyFilter()
         }
     }
-
-    private fun showBackupDialog() {
-        val items = arrayOf(
-            getString(R.string.backup_export),
-            getString(R.string.backup_import),
-            getString(R.string.restore_from_auto)
-        )
-        MaterialAlertDialogBuilder(this)
-            .setTitle(R.string.action_backup)
-            .setItems(items) { _, which ->
-                when (which) {
-                    0 -> launchExport()
-                    1 -> launchImport()
-                    2 -> showAutoBackupDialog()
-                }
-            }
-            .setNegativeButton(R.string.action_cancel, null)
-            .show()
-    }
-
-    private fun showAutoBackupDialog() {
-        lifecycleScope.launch {
-            val backups = withContext(Dispatchers.IO) {
-                BackupManager.listAutoBackups(applicationContext)
-            }
-            if (backups.isEmpty()) {
-                Toast.makeText(this@MainActivity, R.string.auto_backup_list_empty, Toast.LENGTH_SHORT).show()
-                return@launch
-            }
-            val labels = backups.map {
-                BackupManager.autoBackupLabel(applicationContext, it)
-            }.toTypedArray()
-            MaterialAlertDialogBuilder(this@MainActivity)
-                .setTitle(R.string.restore_from_auto)
-                .setItems(labels) { _, which ->
-                    val file = backups[which]
-                    lifecycleScope.launch {
-                        val check = withContext(Dispatchers.IO) {
-                            BackupManager.inspect(applicationContext, Uri.fromFile(file))
-                        }
-                        if (!check.ok) {
-                            Toast.makeText(this@MainActivity, check.message, Toast.LENGTH_LONG).show()
-                            return@launch
-                        }
-                        MaterialAlertDialogBuilder(this@MainActivity)
-                            .setTitle(R.string.backup_confirm_title)
-                            .setMessage(getString(R.string.backup_confirm_msg, check.count))
-                            .setPositiveButton(R.string.action_restore) { _, _ ->
-                                lifecycleScope.launch {
-                                    val result = withContext(Dispatchers.IO) {
-                                        BackupManager.restoreFromAuto(applicationContext, file)
-                                    }
-                                    if (result.ok) {
-                                        Toast.makeText(
-                                            this@MainActivity,
-                                            getString(R.string.backup_restore_ok, result.count),
-                                            Toast.LENGTH_LONG
-                                        ).show()
-                                        restartApp()
-                                    } else {
-                                        Toast.makeText(this@MainActivity, result.message, Toast.LENGTH_LONG).show()
-                                    }
-                                }
-                            }
-                            .setNegativeButton(R.string.action_cancel, null)
-                            .show()
-                    }
-                }
-                .setNegativeButton(R.string.action_cancel, null)
-                .show()
-        }
-    }
-
-    private val exportLauncher =
-        registerForActivityResult(ActivityResultContracts.CreateDocument("application/octet-stream")) { uri ->
-            if (uri == null) return@registerForActivityResult
-            maybeRequestPersistable(uri)
-            lifecycleScope.launch {
-                val result = withContext(Dispatchers.IO) {
-                    BackupManager.export(applicationContext, uri)
-                }
-                if (result.ok) {
-                    Toast.makeText(
-                        this@MainActivity,
-                        getString(R.string.backup_export_ok, result.count),
-                        Toast.LENGTH_LONG
-                    ).show()
-                } else {
-                    Toast.makeText(this@MainActivity, result.message, Toast.LENGTH_LONG).show()
-                }
-            }
-        }
-
-    private val importLauncher =
-        registerForActivityResult(ActivityResultContracts.OpenDocument()) { uri ->
-            if (uri == null) return@registerForActivityResult
-            maybeRequestPersistable(uri)
-            // 先在主线程做一次轻量确认文案所需的信息在 IO 校验后给出
-            lifecycleScope.launch {
-                val check = withContext(Dispatchers.IO) {
-                    BackupManager.inspect(applicationContext, uri)
-                }
-                if (!check.ok) {
-                    Toast.makeText(this@MainActivity, check.message, Toast.LENGTH_LONG).show()
-                    return@launch
-                }
-                MaterialAlertDialogBuilder(this@MainActivity)
-                    .setTitle(R.string.backup_confirm_title)
-                    .setMessage(getString(R.string.backup_confirm_msg, check.count))
-                    .setPositiveButton(R.string.action_restore) { _, _ ->
-                        lifecycleScope.launch {
-                            val result = withContext(Dispatchers.IO) {
-                                BackupManager.restore(applicationContext, uri)
-                            }
-                            if (result.ok) {
-                                Toast.makeText(
-                                    this@MainActivity,
-                                    getString(R.string.backup_restore_ok, result.count),
-                                    Toast.LENGTH_LONG
-                                ).show()
-                                // 数据库文件已整体替换，重启进程以重建连接
-                                restartApp()
-                            } else {
-                                Toast.makeText(
-                                    this@MainActivity, result.message, Toast.LENGTH_LONG
-                                ).show()
-                            }
-                        }
-                    }
-                    .setNegativeButton(R.string.action_cancel, null)
-                    .show()
-            }
-        }
-
-    private fun launchExport() {
-        val name = "english_notebook_" +
-            SimpleDateFormat("yyyyMMdd_HHmm", Locale.getDefault()).format(Date()) + ".db"
-        exportLauncher.launch(name)
-    }
-
-    private fun launchImport() {
-        importLauncher.launch(arrayOf("application/octet-stream", "*/*"))
-    }
-
-    private fun restartApp() {
-        val intent = packageManager.getLaunchIntentForPackage(packageName)
-        intent?.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK)
-        finish()
-        startActivity(intent)
-        Runtime.getRuntime().exit(0)
-    }
-
-    //endregion
 
     override fun onDestroy() {
         tts.shutdown()

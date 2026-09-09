@@ -8,29 +8,9 @@
         app:iconTint="@android:color/white"
         app:showAsAction="always" />
     <item
-        android:id="@+id/action_learning"
-        android:title="@string/action_learning"
-        android:icon="@drawable/ic_school"
-        app:iconTint="@android:color/white"
-        app:showAsAction="always" />
-    <item
-        android:id="@+id/action_backup"
-        android:title="@string/action_backup"
-        android:icon="@drawable/ic_backup"
-        app:iconTint="@android:color/white"
-        app:showAsAction="always" />
-    <item
-        android:id="@+id/action_sync_pc"
-        android:title="@string/action_sync_pc"
-        app:showAsAction="never" />
-    <item
         android:id="@+id/action_settings"
         android:title="@string/action_settings"
-        app:showAsAction="never" />
-    <item
-        android:id="@+id/action_review"
-        android:title="@string/menu_review"
-        android:icon="@drawable/ic_review_alt"
+        android:icon="@drawable/ic_settings"
         app:iconTint="@android:color/white"
         app:showAsAction="always" />
 </menu>

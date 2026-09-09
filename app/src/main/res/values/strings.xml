@@ -59,6 +59,17 @@
     <string name="settings_reset">恢复默认设置</string>
     <string name="settings_reset_done">已恢复默认</string>
     <string name="settings_sample_text">Practice makes perfect. Let us learn English together.</string>
+    <string name="settings_row_review">开始闪卡复习</string>
+    <string name="settings_row_review_desc">选择复习全部，或只复习未掌握的内容</string>
+    <string name="settings_row_learning_only">只显示未掌握的记录</string>
+    <string name="settings_row_learning_only_desc">开启后列表与搜索只出现未掌握内容</string>
+    <string name="settings_section_backup">备份 / 还原</string>
+    <string name="settings_row_backup_export">导出备份（SQLite 数据库文件）</string>
+    <string name="settings_row_backup_import">从备份还原</string>
+    <string name="settings_row_auto_restore">从自动备份恢复</string>
+    <string name="settings_row_sync">电脑推送接收</string>
+    <string name="settings_row_sync_desc">接收来自电脑 Chrome 扩展的推送</string>
+    <string name="settings_applied_back_hint">已生效，返回列表后应用</string>
     <string name="action_sync_pc">电脑同步</string>
     <string name="sync_enable">开启电脑推送接收</string>
     <string name="sync_starting">正在启动接收服务…</string>
